@@ -610,7 +610,7 @@ ${JSON.stringify(badExp)}`;
 
 /* ---------- providers (called from the browser with the teacher's own API key) ---------- */
 const PROVIDERS = {
-  gemini: { label: 'Google Gemini (có gói miễn phí)', defaultModel: 'gemini-2.5-flash',
+  gemini: { label: 'Google Gemini (có gói miễn phí)', defaultModel: 'gemini-3.8-flash',
     build(key, model, prompt){ return { url: 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key),
       headers: {'Content-Type': 'application/json'},
       body: { contents: [{role: 'user', parts: [{text: prompt}]}], generationConfig: { temperature: 0.2, responseMimeType: 'application/json', maxOutputTokens: 32768 } } } },
@@ -627,15 +627,26 @@ const PROVIDERS = {
     parse(j){ if(!j.content) throw new Error('Claude không trả nội dung.'); return j.content.filter(b => b.type === 'text').map(b => b.text).join('') } },
 };
 
-async function callAI(provider, key, model, prompt){
+async function callAI(provider, key, model, prompt, onRetry){
   const P = PROVIDERS[provider]; if(!P) throw new Error('Chưa chọn nhà cung cấp AI.');
   const req = P.build(key, model, prompt);
-  let res;
-  try{ res = await fetch(req.url, {method: 'POST', headers: req.headers, body: JSON.stringify(req.body)}) }
-  catch(e){ throw new Error('Không gọi được API của ' + P.label + ' (mạng/CORS): ' + e.message) }
-  const j = await res.json().catch(() => null);
-  if(!res.ok){ const msg = j && j.error && (j.error.message || j.error.status) || ('HTTP ' + res.status); throw new Error(P.label + ' báo lỗi: ' + msg) }
-  return P.parse(j);
+  const delays = [6000, 15000, 30000, 60000]; // up to 5 attempts total for transient overloads
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  for(let attempt = 0; ; attempt++){
+    let res = null, netErr = null;
+    try{ res = await fetch(req.url, {method: 'POST', headers: req.headers, body: JSON.stringify(req.body)}) }
+    catch(e){ netErr = e }
+    if(netErr){
+      if(attempt < delays.length){ if(onRetry) onRetry(attempt + 2, Math.round(delays[attempt] / 1000), 'lỗi mạng'); await wait(delays[attempt]); continue }
+      throw new Error('Không gọi được API của ' + P.label + ' (mạng/CORS): ' + netErr.message);
+    }
+    const j = await res.json().catch(() => null);
+    if(res.ok) return P.parse(j);
+    const msg = (j && j.error && (j.error.message || j.error.status)) || ('HTTP ' + res.status);
+    const retryable = res.status === 429 || res.status >= 500 || /high demand|overloaded|try again later|resource_exhausted|temporarily/i.test(msg);
+    if(retryable && attempt < delays.length){ if(onRetry) onRetry(attempt + 2, Math.round(delays[attempt] / 1000), 'máy chủ quá tải'); await wait(delays[attempt]); continue }
+    throw new Error(P.label + ' báo lỗi: ' + msg);
+  }
 }
 
 /* ---------- structure normalisation + model assembly (same shape as core.parseText) ---------- */
@@ -880,23 +891,30 @@ openai:'Lấy API key tại platform.openai.com/api-keys (trả phí theo mức 
 anthropic:'Lấy API key tại console.anthropic.com (trả phí theo mức dùng). Key chỉ nằm trên trình duyệt của bạn.'};
 const aiProvSel=$('#aiProvider');
 aiProvSel.innerHTML=Object.keys(PROVIDERS).map(k=>'<option value="'+k+'">'+PROVIDERS[k].label+'</option>').join('');
+let aiCurProv='gemini';
 function aiCfgLoad(){
+  const prov=aiCurProv; aiProvSel.value=prov;
   let cfg={}; try{cfg=JSON.parse(localStorage.getItem('msthao-ai-cfg')||'{}')}catch(e){}
-  const prov=cfg.provider||'gemini'; aiProvSel.value=prov;
-  $('#aiModel').value=cfg['model-'+prov]||PROVIDERS[prov].defaultModel;
+  let savedModel=cfg['model-'+prov];
+  const RETIRED_MODELS={'gemini-2.5-flash':'gemini-3.8-flash','gemini-2.0-flash':'gemini-3.8-flash','gemini-1.5-flash':'gemini-3.8-flash','gemini-1.5-pro':'gemini-3.8-flash'};
+  if(RETIRED_MODELS[savedModel])savedModel=RETIRED_MODELS[savedModel];
+  $('#aiModel').value=savedModel||PROVIDERS[prov].defaultModel;
   $('#aiKeyHint').textContent=AI_HINTS[prov]||'';
   const saved=localStorage.getItem('msthao-ai-key-'+prov);
-  if(saved){$('#aiKey').value=saved;$('#aiSaveKey').checked=true}
+  $('#aiKey').value=saved||'';
+  $('#aiSaveKey').checked=!!saved;
 }
 function aiCfgSave(){
-  const prov=aiProvSel.value; let cfg={}; try{cfg=JSON.parse(localStorage.getItem('msthao-ai-cfg')||'{}')}catch(e){}
+  const prov=aiCurProv; let cfg={}; try{cfg=JSON.parse(localStorage.getItem('msthao-ai-cfg')||'{}')}catch(e){}
   cfg.provider=prov; cfg['model-'+prov]=$('#aiModel').value.trim();
   try{localStorage.setItem('msthao-ai-cfg',JSON.stringify(cfg))}catch(e){}
   if($('#aiSaveKey').checked){try{localStorage.setItem('msthao-ai-key-'+prov,$('#aiKey').value)}catch(e){}}
   else {try{localStorage.removeItem('msthao-ai-key-'+prov)}catch(e){}}
 }
-aiProvSel.addEventListener('change',()=>{aiCfgSave();aiCfgLoad()});
+aiProvSel.addEventListener('change',()=>{aiCfgSave();aiCurProv=aiProvSel.value;aiCfgLoad()});
 ['aiModel','aiKey','aiSaveKey'].forEach(id=>$('#'+id).addEventListener('change',aiCfgSave));
+try{aiCurProv=JSON.parse(localStorage.getItem('msthao-ai-cfg')||'{}').provider||'gemini'}catch(e){}
+if(!PROVIDERS[aiCurProv])aiCurProv='gemini';
 aiCfgLoad();
 let aiRawText='',aiRawName='';
 function aiLog(m){const el=$('#aiLog');el.style.display='block';el.textContent+=(el.textContent?'\n':'')+m;el.scrollTop=el.scrollHeight}
@@ -919,30 +937,33 @@ aiFileInp.addEventListener('change',()=>{if(aiFileInp.files[0])aiHandleFile(aiFi
 ['dragleave','drop'].forEach(ev=>aiDrop.addEventListener(ev,e=>{e.preventDefault();aiDrop.classList.remove('over')}));
 aiDrop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)aiHandleFile(f)});
 $('#aiPasteToggle').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();$('#aiPasteBox').hidden=!$('#aiPasteBox').hidden});
+function aiRetryNote(nextAttempt,sec,why){aiLog('   ⏳ Máy chủ AI đang bận ('+why+') — tự thử lại lần '+nextAttempt+' sau '+sec+' giây, bạn cứ để trang chạy…')}
 let aiModel=null;
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
 $('#btnAiTxt').addEventListener('click',()=>{if(aiModel)downloadBlob(new Blob([modelToFormattedText(aiModel)],{type:'text/plain;charset=utf-8'}),slugify(aiModel.testName)+'_mau-dinh-dang.txt')});
 $('#btnAiDocx').addEventListener('click',async()=>{if(!aiModel)return;try{downloadBlob(await modelToDocxBlob(aiModel),slugify(aiModel.testName)+'_mau-dinh-dang.docx')}catch(e){alert(e.message)}});
 $('#btnAI').addEventListener('click',async()=>{
-  const btn=$('#btnAI'); const prov=aiProvSel.value; const key=$('#aiKey').value.trim(); const mdl=$('#aiModel').value.trim()||PROVIDERS[prov].defaultModel;
+  const btn=$('#btnAI'); const prov=aiProvSel.value; const key=$('#aiKey').value.trim(); let mdl=$('#aiModel').value.trim()||PROVIDERS[prov].defaultModel;
   const pasted=$('#aiPasteText').value.trim(); const raw=pasted||aiRawText;
   if(!key){alert('Bạn chưa nhập API key.');return}
   if(!raw){alert('Bạn chưa chọn file thô (hoặc dán nội dung thô).');return}
   aiCfgSave(); btn.disabled=true; $('#aiLog').textContent='';
+  const MODEL_OK={gemini:/^gemini/i,openai:/^(gpt|o[0-9]|chatgpt)/i,anthropic:/^claude/i};
+  if(MODEL_OK[prov]&&!MODEL_OK[prov].test(mdl)){aiLog('⚠ Model "'+mdl+'" không thuộc nhà cung cấp đã chọn — đã tự đổi về '+PROVIDERS[prov].defaultModel+'.');mdl=PROVIDERS[prov].defaultModel;$('#aiModel').value=mdl}
   try{
     const dd=dedupeRawText(raw);
     aiLog('① Đã gỡ trùng lặp bố cục 2 cột: '+raw.length.toLocaleString()+' → '+dd.text.length.toLocaleString()+' ký tự'+(dd.dropped?' (bỏ '+dd.dropped+' dòng lặp)':''));
     let structText=dd.text;
     if(structText.length>140000){structText=structText.slice(0,140000);aiLog('⚠ Nội dung quá dài, đã cắt còn 140.000 ký tự cho lần phân tích cấu trúc.')}
     aiLog('② Đang gọi AI phân tích cấu trúc (bài đọc + các nhóm câu hỏi)…');
-    const struct=normalizeStruct(parseAIJson(await callAI(prov,key,mdl,buildStructPrompt(structText))));
+    const struct=normalizeStruct(parseAIJson(await callAI(prov,key,mdl,buildStructPrompt(structText),aiRetryNote)));
     const qcount=struct.passages.reduce((a,p)=>a+p.groups.reduce((x,g)=>x+g.items.filter(i=>i.kind==='q').length,0),0);
     aiLog('   ✓ Tìm thấy '+struct.passages.length+' passage, '+qcount+' câu hỏi, '+struct.passages.reduce((a,p)=>a+p.groups.length,0)+' nhóm câu hỏi.');
     const solves=[];
     for(let i=0;i<struct.passages.length;i++){
       const p=struct.passages[i];
       aiLog('③ Passage '+p.num+': đang gọi AI giải '+p.groups.reduce((x,g)=>x+g.items.filter(it=>it.kind==='q').length,0)+' câu + soạn giải thích'+($('#aiVocab').checked?', từ vựng, bài dịch':'')+'…');
-      const sj=parseAIJson(await callAI(prov,key,mdl,buildSolvePrompt(p,{vocab:$('#aiVocab').checked})));
+      const sj=parseAIJson(await callAI(prov,key,mdl,buildSolvePrompt(p,{vocab:$('#aiVocab').checked}),aiRetryNote));
       solves.push({key:sj.key||{},alt:sj.alt||{},exp:sj.exp||{},vocab:sj.vocab||[],tr:sj.tr||[]});
       aiLog('   ✓ Xong Passage '+p.num+': '+Object.keys(solves[i].key).length+' đáp án, '+solves[i].vocab.length+' từ vựng.');
     }
@@ -959,7 +980,7 @@ $('#btnAI').addEventListener('click',async()=>{
           const badExp={}; bad[pid].forEach(q=>{if(p.exp[q])badExp[q]=p.exp[q]});
           aiLog('⑤ Đang gọi AI sửa câu bằng chứng chưa khớp cho '+pid+' (câu '+bad[pid].join(', ')+')…');
           try{
-            const rj=parseAIJson(await callAI(prov,key,mdl,buildRepairPrompt(p,badExp)));
+            const rj=parseAIJson(await callAI(prov,key,mdl,buildRepairPrompt(p,badExp),aiRetryNote));
             Object.keys(rj.exp||{}).forEach(q=>{p.exp[q]=rj.exp[q]});
             aiLog('   ✓ Đã sửa — kết quả cuối cùng xem ở mục "Cần kiểm tra" (nếu còn dòng nào tức là câu đó AI không tìm được câu bằng chứng nguyên văn).');
           }catch(e){aiLog('   ⚠ Sửa không thành công: '+e.message)}
