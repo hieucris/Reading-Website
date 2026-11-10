@@ -1,4 +1,4 @@
-# Doc → HTML · Công cụ tạo bài Reading tương tác (Ms Yen English)
+# Doc → HTML · Công cụ tạo bài Reading tương tác (Ms Thao English)
 
 Website tĩnh 100%: toàn bộ việc đọc file .docx và tạo file HTML chạy ngay trong trình duyệt của người dùng.
 Không có server, không có database, file Word không được tải lên máy chủ nào cả.

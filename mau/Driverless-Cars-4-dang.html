@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mini Test · Driverless Cars (chỉ 4 dạng câu hỏi)</title>
+<style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Layout: brand banner → sticky nav (passage tabs + numbered sub-pills) → one sub-panel at a time; reading = split passage | questions */
+:root{
+  --bg:#f7f7f6; --surface:#ffffff; --ink:#1c1c1e; --muted:#66666b; --line:#e2e1df; --soft:#f0efed;
+  --red:#b4493f; --red-soft:#f7e9e7; --ok:#2e7a4c; --ok-soft:#e5f2ea; --bad:#b53a31; --bad-soft:#f8e4e2;
+  --hl-y:#fff0a3; --hl-g:#cfeccf; --hl-p:#f8d2dc; --hl-n:#e6e6e6; --banner:#232325; --banner-ink:#f4f4f4; --loc:#fde7b0;
+  --f-head:Georgia,'Times New Roman',serif; --f-body:'Segoe UI',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141415; --surface:#1d1d1f; --ink:#ececec; --muted:#a2a2a7; --line:#333336; --soft:#262628;
+  --red:#e0837a; --red-soft:#3a2523; --ok:#7fcf9c; --ok-soft:#1d3226; --bad:#f08c84; --bad-soft:#3d2321;
+  --hl-y:#5c5320; --hl-g:#24462b; --hl-p:#572c39; --hl-n:#3a3a3d; --banner:#0d0d0e; --banner-ink:#ececec; --loc:#5a4a1e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141415; --surface:#1d1d1f; --ink:#ececec; --muted:#a2a2a7; --line:#333336; --soft:#262628;
+  --red:#e0837a; --red-soft:#3a2523; --ok:#7fcf9c; --ok-soft:#1d3226; --bad:#f08c84; --bad-soft:#3d2321;
+  --hl-y:#5c5320; --hl-g:#24462b; --hl-p:#572c39; --hl-n:#3a3a3d; --banner:#0d0d0e; --banner-ink:#ececec; --loc:#5a4a1e; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--f-head);text-wrap:balance;line-height:1.25;margin:0}
+h2{font-size:1.3rem;color:var(--red)} h3{font-size:1.05rem;color:var(--red)} h4{font-size:1.02rem}
+p{margin:0}
+.brand{background:var(--banner);color:var(--banner-ink);border-radius:0 0 10px 10px;padding:20px 24px 18px;display:flex;flex-direction:column;gap:6px}
+.brand .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.brand h1{font-size:1.55rem}
+.brand .sub{opacity:.85;font-size:.98rem}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.parts{display:flex;flex-wrap:wrap;gap:0;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;width:max-content;max-width:100%}
+.ptab{font:inherit;font-weight:700;padding:7px 18px;border:none;background:var(--surface);color:var(--ink);cursor:pointer}
+.ptab+.ptab{border-left:1.5px solid var(--ink)}
+.ptab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font:inherit;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);cursor:pointer}
+.pill .n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;border:1.5px solid var(--line);color:var(--muted)}
+.pill[aria-selected="true"]{border-color:var(--red);font-weight:700}
+.pill[aria-selected="true"] .n{background:var(--red);border-color:var(--red);color:var(--surface)}
+.hintline{font-size:.86rem;color:var(--muted)}
+button:focus-visible,input:focus-visible,select:focus-visible,.chip:focus-visible,.slot:focus-visible,.fc:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.btn{font:inherit;font-size:.92rem;padding:6px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.red{border-color:var(--red);color:var(--red)}
+.btn.on{border-color:var(--red);background:var(--red-soft)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sub{padding-top:22px;display:flex;flex-direction:column;gap:18px}
+.lead{color:var(--muted)}
+.hint{font-size:.88rem;color:var(--muted)}
+/* vocab */
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.vgrid{grid-template-columns:1fr}}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.vcard .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.vcard .w{font-weight:700;font-size:1.08rem}
+.vcard .pos{font-style:italic;color:var(--muted);font-weight:400}
+.vcard .vi{color:var(--red);font-weight:700}
+.vcard .ex{font-style:italic;color:var(--muted);font-size:.93rem}
+.say{font:inherit;font-size:.8rem;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--ink);cursor:pointer}
+/* flashcards */
+.fcwrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.fcmeta{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;color:var(--muted);font-size:.92rem;font-variant-numeric:tabular-nums}
+.fc{width:min(560px,100%);height:280px;perspective:1200px;cursor:pointer;border:none;background:none;padding:0;font:inherit;color:inherit}
+.fc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.fc.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.face.back{transform:rotateY(180deg);border-color:var(--red)}
+.face .big{font-family:var(--f-head);font-size:2rem;font-weight:700;line-height:1.2}
+.face .vi{color:var(--red);font-weight:700;font-size:1.35rem}
+.face .ex{font-style:italic;color:var(--muted);font-size:.95rem}
+.face .tap{position:absolute;bottom:12px;font-size:.78rem;color:var(--muted)}
+.face .known{position:absolute;top:12px;right:14px;font-size:.78rem;color:var(--ok);font-weight:700}
+@media (prefers-reduced-motion:reduce){.fc .in{transition:none}}
+/* reading split */
+.split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px 24px;min-width:0;max-height:calc(100dvh - 190px);overflow-y:auto;position:sticky;top:calc(env(safe-area-inset-top,0px) + 140px)}
+@media (max-width:920px){.split{grid-template-columns:1fr}.col{max-height:none;position:static}}
+.passage{font-family:var(--f-head);font-size:0.95rem;line-height:1.65;display:flex;flex-direction:column;gap:14px}
+.passage h3{color:var(--ink);font-size:1.4rem;text-align:center}
+.passage .subh{font-style:italic;text-align:center;color:var(--muted)}
+.passage .pl{font-weight:700;margin-right:6px}
+.passage .gloss{font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.loc-on{background:var(--loc);border-radius:3px;box-shadow:0 0 0 2px var(--loc)}
+.qs{display:flex;flex-direction:column;gap:18px}
+.qblock{display:flex;flex-direction:column;gap:10px}
+.qhead{background:var(--soft);border-radius:8px;padding:10px 14px}
+.qhead b{font-family:var(--f-head)}
+.qitem{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:8px;border:1px solid transparent}
+.qitem.right{border-color:var(--ok);background:var(--ok-soft)}
+.qitem.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.qnum{font-weight:700;font-family:var(--f-head);margin-right:6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px 16px}
+.opts label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.clr{font:inherit;font-size:.8rem;padding:1px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;align-self:flex-start}
+.clr:hover{border-color:var(--red);color:var(--red)}
+.done .clr{display:none}
+.notes{font-family:var(--f-head);display:flex;flex-direction:column;gap:6px}
+.notes .nt{font-weight:700;text-align:center;font-size:1.1rem}
+.notes .ns{font-weight:700;margin-top:6px}
+.notes .qitem{padding:4px 10px}
+.gin{font:inherit;font-family:var(--f-body);width:150px;padding:1px 6px;border:none;border-bottom:1.5px dotted var(--muted);background:var(--soft);color:var(--ink);border-radius:4px 4px 0 0}
+.gbox{display:inline-flex;align-items:center;gap:4px}
+.gbox .qn{font-weight:700;font-family:var(--f-body);font-size:.82rem;border:1.5px solid var(--ink);border-radius:4px;padding:0 5px}
+.dyn{font-family:var(--f-body);font-size:.9rem;font-weight:700}
+.qitem.right .dyn{color:var(--ok)} .qitem.wrong .dyn{color:var(--bad)}
+.exp{font-family:var(--f-body);font-size:.93rem;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.exp .ql{font-style:italic}
+.exp .en{font-style:italic;border-left:3px solid var(--red);padding-left:10px}
+.exp .vi{color:var(--muted);padding-left:13px}
+.exp .lbl{font-weight:700;text-decoration:underline;font-style:italic}
+.exp .ans{font-weight:700;color:var(--red)}
+.loc-btn{font:inherit;font-size:.8rem;padding:2px 10px;border-radius:999px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer;align-self:flex-start}
+/* matching drag */
+.bank{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1.5px dashed var(--line);border-radius:10px;background:var(--soft)}
+.chip{min-width:34px;text-align:center;padding:4px 10px;border-radius:7px;background:var(--surface);border:1.5px solid var(--muted);cursor:grab;user-select:none;font-weight:700;touch-action:manipulation}
+.chip.sel{border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)}
+.slot{display:inline-flex;align-items:center;justify-content:center;min-width:52px;min-height:32px;border:1.5px dashed var(--muted);border-radius:7px;vertical-align:middle;cursor:pointer;margin-right:8px;background:var(--surface)}
+.slot.over{background:var(--red-soft)}
+.mrow{display:flex;align-items:center;gap:6px}
+.mrow > .txt{min-width:0}
+.multi label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;padding:3px 0}
+.multi label b{font-family:var(--f-head);min-width:18px}
+.scorebox{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--banner);color:var(--banner-ink);border-radius:10px;padding:12px 16px}
+.scorebox .big{font-family:var(--f-head);font-size:1.6rem;font-weight:700}
+.scorebox .btn{background:transparent;color:var(--banner-ink);border-color:var(--banner-ink)}
+/* highlight & notes */
+mark.hl{color:inherit;border-radius:2px;padding:0 1px;cursor:pointer}
+mark.hl-y{background:var(--hl-y)} mark.hl-g{background:var(--hl-g)} mark.hl-p{background:var(--hl-p)}
+mark.hl-n{background:var(--hl-n);border-bottom:2px dotted var(--red)}
+mark.flash{outline:2px solid var(--red)}
+.ntag{display:inline;font-family:var(--f-body);font-style:normal;font-weight:400;font-size:.78rem;line-height:1.3;color:var(--red);background:var(--red-soft);border:1px solid var(--red);border-radius:6px;padding:0 6px;margin:0 3px;cursor:pointer;white-space:normal;word-break:break-word}
+.ntag::before{content:"✎ "}
+.tb{position:absolute;z-index:20;display:flex;gap:4px;align-items:center;background:var(--banner);color:var(--banner-ink);padding:6px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.tb button{font:inherit;font-size:.85rem;border:none;cursor:pointer;border-radius:6px}
+.sw{width:26px;height:26px;border:2px solid var(--banner-ink)!important}
+.sw.y{background:#ffe866}.sw.g{background:#9fdca3}.sw.p{background:#f4a9bd}
+.tb .txt{background:transparent;color:var(--banner-ink);padding:4px 8px}
+.pop{position:absolute;z-index:21;max-width:300px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:8px;font-size:.92rem}
+.pop .t{white-space:pre-wrap}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.4);display:grid;place-items:center;padding:16px}
+.modal .box{background:var(--surface);color:var(--ink);border-radius:12px;padding:20px;width:min(460px,100%);display:flex;flex-direction:column;gap:10px}
+.modal blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--red);font-style:italic;color:var(--muted)}
+.modal textarea,.notepad textarea{font:inherit;width:100%;min-height:100px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;font:inherit;font-weight:700;padding:10px 16px;border-radius:999px;border:none;background:var(--red);color:#fff;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:25;width:min(380px,100%);background:var(--surface);border-left:1px solid var(--line);padding:calc(18px + env(safe-area-inset-top,0px)) calc(18px + env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;box-shadow:-8px 0 24px rgba(0,0,0,.15)}
+.nlist{display:flex;flex-direction:column;gap:8px}
+.nitem{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.nitem .q{font-style:italic;color:var(--muted);font-size:.9rem}
+.nitem .where{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:560px){.col{padding:16px}.brand h1{font-size:1.55rem}.face .big{font-size:1.6rem}}
+
+.hlist{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.92rem}
+.hlist p{margin:0}.hlist b{font-family:var(--f-head);display:inline-block;min-width:34px}
+.slot{min-width:64px}
+table.pp{border-collapse:collapse;width:100%;font-size:.88rem;margin-top:2px}
+table.pp th,table.pp td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+table.pp th{background:var(--soft);font-weight:700}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 24px}
+.tr{display:flex;flex-direction:column;gap:14px}
+.titem{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.titem p{margin:0}
+.tin{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);max-width:560px}
+.tans{color:var(--ok);font-size:.95rem}
+/* compact header + wider reading area */
+.wrap{max-width:1560px}
+.brand{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:8px 18px;border-radius:0 0 8px 8px}
+.brand .eyebrow{font-size:.7rem}
+.brand h1{font-size:1.05rem}
+.brand .sub{padding-top:0;font-size:.8rem;display:block}
+.nav{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:6px 0}
+.ptab{padding:5px 14px;font-size:.9rem}
+.pill{padding:3px 12px 3px 4px;font-size:.88rem}
+.pill .n{width:20px;height:20px;font-size:.72rem}
+.sub{padding-top:12px;gap:14px}
+.split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px}
+.col{max-height:calc(100dvh - 72px);top:calc(env(safe-area-inset-top,0px) + 56px);padding:18px 22px}
+.vgrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){.vgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:820px){.vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.vgrid{grid-template-columns:1fr}}
+@media (max-width:920px){.split{grid-template-columns:1fr}.col{max-height:none;position:static}}
+
+
+/* summary / table / flow-chart completion (GAP kinds) + short answer */
+.sumflow{font-family:var(--f-head);line-height:2.15;background:var(--soft);border-radius:8px;padding:12px 16px}
+.sumflow .qitem{display:inline;padding:2px 3px;border-radius:6px}
+.sumflow .qitem .exp{display:flex;margin:8px 0}
+.sumflow .nt,.ctable .nt,.flow .nt{font-weight:700;text-align:center;font-size:1.08rem;font-family:var(--f-head)}
+.sumflow .ns,.ctable .ns,.flow .ns{font-weight:700;margin-top:6px;font-family:var(--f-head)}
+.ctable{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:var(--f-head)}
+.trow{display:flex;flex-wrap:wrap;border-top:1px solid var(--line)}
+.trow:first-child{border-top:none}
+.trow.ctxrow{background:var(--soft);font-weight:600}
+.tcell{flex:1 1 140px;padding:9px 12px;border-left:1px solid var(--line);min-width:0}
+.tcell:first-child{border-left:none}
+.trow.qitem{padding:0;gap:0;border-left:none;border-right:none;border-bottom:none;border-radius:0}
+.trow.qitem.right{background:var(--ok-soft)}
+.trow.qitem.wrong{background:var(--bad-soft)}
+.trow>.dyn,.trow>.exp{flex:1 1 100%;padding:6px 12px}
+.flow{display:flex;flex-direction:column;gap:4px}
+.flow .farrow{text-align:center;color:var(--muted);font-size:1.15rem;line-height:1.1}
+.flow .qitem,.flow .fstep{background:var(--soft);border-radius:8px}
+
+</style></head><body>
+<div class="wrap">
+<header class="brand"><div class="eyebrow">Ms Thao English · IELTS Reading</div><h1>Mini Test · Driverless Cars (chỉ 4 dạng câu hỏi)</h1><div class="sub">Driverless Cars · Questions 1–19</div></header>
+<nav class="nav"><div class="parts" role="tablist"><button class="ptab" data-part="P2" role="tab">Passage 2 · Driverless Cars</button></div><div class="pills" role="tablist"><button class="pill" data-sub="v" role="tab"><span class="n">1</span>Từ vựng</button><button class="pill" data-sub="f" role="tab"><span class="n">2</span>Flashcard</button><button class="pill" data-sub="r" role="tab"><span class="n">3</span>Bài đọc</button><button class="pill" data-sub="t" role="tab"><span class="n">4</span>Dịch Anh → Việt</button></div></nav>
+<section class="part" id="P2" hidden>
+<div class="sub hl-zone" id="P2v" data-sub="v" data-label="P2 · Từ vựng"><div><h2>Từ vựng · Driverless Cars</h2><p class="lead">Từ quan trọng trong bài đọc và câu hỏi. Bấm “▶ nghe” để nghe phát âm.</p></div><div class="vgrid" data-deck="P2"></div></div>
+<div class="sub" data-sub="f"><div><h2>Flashcard · Driverless Cars</h2><p class="lead">Bấm vào thẻ để lật. Đánh dấu “Đã thuộc” để lọc ra những từ cần ôn tiếp.</p></div><div class="fcwrap" data-fc="P2"></div></div>
+<div class="sub" data-sub="r"><div class="split"><div class="col hl-zone" id="P2p" data-label="P2 · Bài đọc"><div class="passage"><h3>Driverless Cars</h3><p><span class="pl">A</span>The automotive sector is well used to adapting to automation in manufacturing. The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production. A new challenge to vehicle production is now on the horizon and, again, it comes from automation. However, this time it is not to do with the manufacturing process, but with the vehicles themselves.</p><p>Research projects on vehicle automation are not new. Vehicles with limited self-driving capabilities have been around for more than 50 years, resulting in significant contributions towards driver assistance systems. But since Google announced in 2010 that it had been trialling self-driving cars on the streets of California, progress in this field has quickly gathered pace.</p><p><span class="pl">B</span>There are many reasons why technology is advancing so fast. One frequently cited motive is safety; indeed, research at the UK's Transport Research Laboratory has demonstrated that more than 90 percent of road collisions involve human error as a contributory factor, and it is the primary cause in the vast majority. Automation may help to reduce the incidence of this.</p><p>Another aim is to free the time people spend driving for other purposes. If the vehicle can do some or all of the driving, it may be possible to be productive, to socialise or simply to relax while automation systems have responsibility for safe control of the vehicle. If the vehicle can do the driving, those who are challenged by existing mobility models – such as older or disabled travellers – may be able to enjoy significantly greater travel autonomy.</p><p><span class="pl">C</span>Beyond these direct benefits, we can consider the wider implications for transport and society, and how manufacturing processes might need to respond as a result. At present, the average car spends more than 90 percent of its life parked. Automation means that initiatives for car-sharing become much more viable, particularly in urban areas with significant travel demand. If a significant proportion of the population choose to use shared automated vehicles, mobility demand can be met by far fewer vehicles.</p><p><span class="pl">D</span>The Massachusetts Institute of Technology investigated automated mobility in Singapore, finding that fewer than 30 percent of the vehicles currently used would be required if fully automated car sharing could be implemented. If this is the case, it might mean that we need to manufacture far fewer vehicles to meet demand.</p><p>However, the number of trips being taken would probably increase, partly because empty vehicles would have to be moved from one customer to the next.</p><p>Modelling work by the University of Michigan Transportation Research Institute suggests automated vehicles might reduce vehicle ownership by 43 percent, but that vehicles' average annual mileage would double as a result. As a consequence, each vehicle would be used more intensively, and might need replacing sooner. This faster rate of turnover may mean that vehicle production will not necessarily decrease.</p><p><span class="pl">E</span>Automation may prompt other changes in vehicle manufacture. If we move to a model where consumers are tending not to own a single vehicle but to purchase access to a range of vehicles through a mobility provider, drivers will have the freedom to select one that best suits their needs for a particular journey, rather than making a compromise across all their requirements.</p><p>Since, for most of the time, most of the seats in most cars are unoccupied, this may boost production of a smaller, more efficient range of vehicles that suit the needs of individuals. Specialised vehicles may then be available for exceptional journeys, such as going on a family camping trip or helping a son or daughter move to university.</p><p><span class="pl">F</span>There are a number of hurdles to overcome in delivering automated vehicles to our roads. These include the technical difficulties in ensuring that the vehicle works reliably in the infinite range of traffic, weather and road situations it might encounter; the regulatory challenges in understanding how liability and enforcement might change when drivers are no longer essential for vehicle operation; and the societal changes that may be required for communities to trust and accept automated vehicles as being a valuable part of the mobility landscape.</p><p><span class="pl">G</span>It's clear that there are many challenges that need to be addressed but, through robust and targeted research, these can most probably be conquered within the next 10 years. Mobility will change in such potentially significant ways and in association with so many other technological developments, such as telepresence and virtual reality, that it is hard to make concrete predictions about the future. However, one thing is certain: change is coming, and the need to be flexible in response to this will be vital for those involved in manufacturing the vehicles that will deliver future mobility.</p></div></div><div class="col hl-zone" id="P2q" data-label="P2 · Câu hỏi"><form class="qs" data-form="P2" onsubmit="return false"><div class="qblock"><div class="qhead"><b>Questions 1–5</b><br>Choose the correct letter, A, B, C or D.</div><div class="qitem" data-q="1" data-t="mcq"><div><span class="qnum">1</span>What does the writer say about the development of vehicle automation?</div><div class="multi"><label><input type="radio" name="q1" value="A"><b>A</b><span>It began as a direct result of improvements in car manufacturing.</span></label><label><input type="radio" name="q1" value="B"><b>B</b><span>It has developed rapidly since Google's announcement in 2010.</span></label><label><input type="radio" name="q1" value="C"><b>C</b><span>It has mainly focused on reducing the cost of vehicle production.</span></label><label><input type="radio" name="q1" value="D"><b>D</b><span>It has been delayed by a lack of research funding.</span></label></div></div><div class="qitem" data-q="2" data-t="mcq"><div><span class="qnum">2</span>According to the passage, one potential advantage of automated vehicles is that people can:</div><div class="multi"><label><input type="radio" name="q2" value="A"><b>A</b><span>avoid travelling during peak hours.</span></label><label><input type="radio" name="q2" value="B"><b>B</b><span>spend their travelling time on other activities.</span></label><label><input type="radio" name="q2" value="C"><b>C</b><span>eliminate the need for public transport.</span></label><label><input type="radio" name="q2" value="D"><b>D</b><span>reduce the distance between their homes and workplaces.</span></label></div></div><div class="qitem" data-q="3" data-t="mcq"><div><span class="qnum">3</span>What did the research conducted in Singapore suggest?</div><div class="multi"><label><input type="radio" name="q3" value="A"><b>A</b><span>More than 90% of existing vehicles could be replaced.</span></label><label><input type="radio" name="q3" value="B"><b>B</b><span>Fully automated vehicles would increase the number of cars required.</span></label><label><input type="radio" name="q3" value="C"><b>C</b><span>Fewer than 30% of current vehicles might be sufficient under a car-sharing system.</span></label><label><input type="radio" name="q3" value="D"><b>D</b><span>Car-sharing would only be effective in rural areas.</span></label></div></div><div class="qitem" data-q="4" data-t="mcq"><div><span class="qnum">4</span>What is one possible consequence of automated vehicles being used more intensively?</div><div class="multi"><label><input type="radio" name="q4" value="A"><b>A</b><span>They may need to be replaced more frequently.</span></label><label><input type="radio" name="q4" value="B"><b>B</b><span>They will become significantly more expensive to manufacture.</span></label><label><input type="radio" name="q4" value="C"><b>C</b><span>They will require fewer maintenance services.</span></label><label><input type="radio" name="q4" value="D"><b>D</b><span>Their annual mileage will decrease.</span></label></div></div><div class="qitem" data-q="5" data-t="mcq"><div><span class="qnum">5</span>What is the writer's main point in the final paragraph?</div><div class="multi"><label><input type="radio" name="q5" value="A"><b>A</b><span>Automated vehicles will completely replace traditional cars within ten years.</span></label><label><input type="radio" name="q5" value="B"><b>B</b><span>Vehicle manufacturers should focus exclusively on technological innovation.</span></label><label><input type="radio" name="q5" value="C"><b>C</b><span>Future developments are difficult to predict, so flexibility will be important.</span></label><label><input type="radio" name="q5" value="D"><b>D</b><span>Telepresence and virtual reality will make personal transport unnecessary.</span></label></div></div></div><div class="qblock"><div class="qhead"><b>Questions 6–10</b><br>Which paragraph contains the following information? Write the correct letter, A–G. You may use any letter more than once.</div><div class="bank" data-mbank="A,B,C,D,E,F,G"></div><div class="qitem" data-q="6" data-t="match"><div class="mrow"><span class="slot"></span><span class="txt"><span class="qnum">6</span>An example of research showing that a significantly smaller fleet of vehicles could meet transport demand.</span></div></div><div class="qitem" data-q="7" data-t="match"><div class="mrow"><span class="slot"></span><span class="txt"><span class="qnum">7</span>A prediction that the average distance travelled by each automated vehicle annually could increase considerably.</span></div></div><div class="qitem" data-q="8" data-t="match"><div class="mrow"><span class="slot"></span><span class="txt"><span class="qnum">8</span>A reference to the benefits of automated vehicles for people who have difficulty using existing transport systems.</span></div></div><div class="qitem" data-q="9" data-t="match"><div class="mrow"><span class="slot"></span><span class="txt"><span class="qnum">9</span>An explanation of why specialised vehicles might still be needed for certain unusual journeys.</span></div></div><div class="qitem" data-q="10" data-t="match"><div class="mrow"><span class="slot"></span><span class="txt"><span class="qnum">10</span>A discussion of the legal responsibilities associated with vehicles that no longer require human drivers.</span></div></div></div><div class="qblock"><div class="qhead"><b>Questions 11–15</b><br>Complete the summary below. Choose NO MORE THAN TWO WORDS from the passage for each answer.</div><div class="sumflow"><span class="ctx">Automated vehicles could transform the way people travel and how cars are manufactured. One major benefit is improved road safety, as human error is a significant contributing factor in road </span><span class="qitem" data-q="11" data-t="gap"><span><span class="gbox"><span class="qn">11</span><input class="gin" id="i11" autocomplete="off"></span>.</span></span> <span class="ctx">Another advantage is that passengers could use their travelling time more productively instead of concentrating on </span><span class="qitem" data-q="12" data-t="gap"><span><span class="gbox"><span class="qn">12</span><input class="gin" id="i12" autocomplete="off"></span>.</span></span> <span class="ctx">Furthermore, older and disabled people may gain greater independence in terms of mobility. The development of automated car-sharing systems could also reduce the number of vehicles required. However, the total distance travelled by each vehicle might increase, resulting in greater </span><span class="qitem" data-q="13" data-t="gap"><span><span class="gbox"><span class="qn">13</span><input class="gin" id="i13" autocomplete="off"></span> and potentially shorter vehicle lifespans. In addition, consumers may choose from a range of vehicles according to their specific</span></span> <span class="qitem" data-q="14" data-t="gap"><span><span class="gbox"><span class="qn">14</span><input class="gin" id="i14" autocomplete="off"></span> rather than owning one car for all purposes. Nevertheless, several obstacles remain, including technical, regulatory and</span></span> <span class="qitem" data-q="15" data-t="gap"><span><span class="gbox"><span class="qn">15</span><input class="gin" id="i15" autocomplete="off"></span> challenges.</span></span> </div></div><div class="qblock"><div class="qhead"><b>Questions 16–19</b><br>Answer the questions below. Choose NO MORE THAN THREE WORDS from the passage for each answer.</div><div class="notes"><div class="qitem" data-q="16" data-t="gap"><div>In which year did Google announce that it had been testing self-driving cars in California?<span class="gbox"><span class="qn">16</span><input class="gin" id="i16" autocomplete="off"></span></div></div><div class="qitem" data-q="17" data-t="gap"><div>Which group of travellers might gain greater travel autonomy from automated vehicles, apart from older people?<span class="gbox"><span class="qn">17</span><input class="gin" id="i17" autocomplete="off"></span></div></div><div class="qitem" data-q="18" data-t="gap"><div>Which two examples of technology are mentioned alongside future mobility developments?<span class="gbox"><span class="qn">18</span><input class="gin" id="i18" autocomplete="off"></span></div></div><div class="qitem" data-q="19" data-t="gap"><div>According to the writer, what will be vital for people involved in manufacturing future vehicles?<span class="gbox"><span class="qn">19</span><input class="gin" id="i19" autocomplete="off"></span></div></div></div></div><div class="bar"><button class="btn primary" data-act="submit" type="button">Nộp bài</button><button class="btn" data-act="reset" type="button">Làm lại</button></div><div class="scorebox" data-score hidden></div></form></div></div></div>
+<div class="sub hl-zone" id="P2t" data-sub="t" data-label="P2 · Dịch"><div><h2>Dịch Anh → Việt · Driverless Cars</h2><p class="lead">Dịch cụm từ in đậm sang tiếng Việt. Bấm “Xem đáp án” để so sánh.</p></div><div class="card"><form class="tr" data-tr="P2" onsubmit="return false"></form></div></div>
+</section>
+<footer><span>Ms Thao English · Đà Nẵng</span><span>Mini Test · Driverless Cars (chỉ 4 dạng câu hỏi)</span></footer></div>
+<button class="fab" id="fab">Ghi chú (0)</button>
+<aside class="drawer" id="drawer" hidden><div class="bar" style="justify-content:space-between"><h3>Ghi chú của tôi</h3><button class="btn" id="dclose">Đóng</button></div><div class="notepad"><label class="hint" for="freeNote">Ghi chú tự do</label><textarea id="freeNote" placeholder="Viết ghi chú của bạn ở đây…"></textarea></div><h4>Ghi chú gắn với bài</h4><div id="nlist" class="nlist"></div><button class="btn red" id="clearAll">Xoá tất cả highlight &amp; ghi chú</button></aside>
+<div class="tb" id="tb" hidden><button class="sw y" data-c="y" aria-label="Highlight vàng"></button><button class="sw g" data-c="g" aria-label="Highlight xanh"></button><button class="sw p" data-c="p" aria-label="Highlight hồng"></button><button class="txt" data-c="note">✎ Ghi chú</button></div>
+<div class="pop" id="pop" hidden><div class="t" id="popText"></div><div class="bar"><button class="btn" id="popEdit">✎ Ghi chú</button><button class="btn red" id="popDel">Xoá</button></div></div>
+<div class="modal" id="modal" hidden><div class="box"><h3>Ghi chú</h3><blockquote id="mQuote"></blockquote><textarea id="mText" placeholder="Nhập ghi chú…"></textarea><div class="bar"><button class="btn primary" id="mSave">Lưu</button><button class="btn" id="mCancel">Huỷ</button></div></div></div>
+<script>
+
+
+(function(){
+const LS='msthao-mini-test-driverless-cars-chi-4-dang-cau-hoi-v1-';
+const store={get(k){try{return localStorage.getItem(LS+k)}catch(e){return null}},set(k,v){try{localStorage.setItem(LS+k,v)}catch(e){}},del(k){try{localStorage.removeItem(LS+k)}catch(e){}}};
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+const VOC={"P2":[["automotive sector","noun phrase /ˌɔː.təˈməʊ.tɪv ˈsek.tər/","ngành công nghiệp ô tô","The automotive sector is well used to adapting to automation in manufacturing."],["automation","noun /ˌɔː.təˈmeɪ.ʃən/","sự tự động hóa","The automotive sector is well used to adapting to automation in manufacturing."],["implementation","noun /ˌɪm.plɪ.menˈteɪ.ʃən/","sự triển khai, thực hiện","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["robotic car manufacture","noun phrase /rəʊˈbɒt.ɪk kɑː ˌmæn.jəˈfæk.tʃər/","sản xuất ô tô bằng robot","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["cost savings","noun phrase /ˈkɒst ˌseɪ.vɪŋz/","khoản tiết kiệm chi phí","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["reliability","noun /rɪˌlaɪ.əˈbɪl.ə.ti/","độ tin cậy","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["flexibility","noun /ˌflek.səˈbɪl.ə.ti/","tính linh hoạt","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["mass production","noun phrase /ˌmæs prəˈdʌk.ʃən/","sản xuất hàng loạt","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["self-driving capabilities","noun phrase /ˌself ˈdraɪ.vɪŋ ˌkeɪ.pəˈbɪl.ə.tiz/","khả năng tự lái","Vehicles with limited self-driving capabilities have been around for more than 50 years, resulting in significant contributions towards driver assistance systems."],["driver assistance systems","noun phrase /ˈdraɪ.vər əˌsɪs.təns ˈsɪs.təmz/","hệ thống hỗ trợ người lái","Vehicles with limited self-driving capabilities have been around for more than 50 years, resulting in significant contributions towards driver assistance systems."],["gather pace","verb phrase /ˌɡæð.ər ˈpeɪs/","tăng tốc, phát triển nhanh","But since Google announced in 2010 that it had been trialling self-driving cars on the streets of California, progress in this field has quickly gathered pace."],["contributory factor","noun phrase /kənˈtrɪb.jə.tər.i ˈfæk.tər/","yếu tố góp phần","One frequently cited motive is safety; indeed, research at the UK's Transport Research Laboratory has demonstrated that more than 90 percent of road collisions involve human error as a contributory factor, and it is the primary cause in the vast majority."],["primary cause","noun phrase /ˌpraɪ.mər.i ˈkɔːz/","nguyên nhân chính","One frequently cited motive is safety; indeed, research at the UK's Transport Research Laboratory has demonstrated that more than 90 percent of road collisions involve human error as a contributory factor, and it is the primary cause in the vast majority."],["incidence","noun /ˈɪn.sɪ.dəns/","tỷ lệ/mức độ xảy ra","Automation may help to reduce the incidence of this."],["socialise","verb /ˈsəʊ.ʃəl.aɪz/","giao lưu, tương tác xã hội","If the vehicle can do some or all of the driving, it may be possible to be productive, to socialise or simply to relax while automation systems have responsibility for safe control of the vehicle."],["mobility","noun /məʊˈbɪl.ə.ti/","khả năng di chuyển; tính cơ động","If the vehicle can do the driving, those who are challenged by existing mobility models – such as older or disabled travellers – may be able to enjoy significantly greater travel autonomy."],["travel autonomy","noun phrase /ˈtræv.əl ɔːˈtɒn.ə.mi/","quyền tự chủ trong việc đi lại","If the vehicle can do the driving, those who are challenged by existing mobility models – such as older or disabled travellers – may be able to enjoy significantly greater travel autonomy."],["wider implications","noun phrase /ˌwaɪ.dər ˌɪm.plɪˈkeɪ.ʃənz/","những tác động rộng hơn","Beyond these direct benefits, we can consider the wider implications for transport and society, and how manufacturing processes might need to respond as a result."],["car-sharing","noun /ˈkɑː ˌʃeə.rɪŋ/","dịch vụ/chương trình dùng chung ô tô","Automation means that initiatives for car-sharing become much more viable, particularly in urban areas with significant travel demand."],["viable","adjective /ˈvaɪ.ə.bəl/","khả thi","Automation means that initiatives for car-sharing become much more viable, particularly in urban areas with significant travel demand."],["travel demand","noun phrase /ˈtræv.əl dɪˌmɑːnd/","nhu cầu đi lại","Automation means that initiatives for car-sharing become much more viable, particularly in urban areas with significant travel demand."],["fully automated","adjective /ˈfʊl.i ˈɔː.tə.meɪ.tɪd/","được tự động hóa hoàn toàn","The Massachusetts Institute of Technology investigated automated mobility in Singapore, finding that fewer than 30 percent of the vehicles currently used would be required if fully automated car sharing could be implemented."],["vehicle ownership","noun phrase /ˈvɪə.kəl ˈəʊ.nə.ʃɪp/","việc sở hữu phương tiện","Modelling work by the University of Michigan Transportation Research Institute suggests automated vehicles might reduce vehicle ownership by 43 percent, but that vehicles' average annual mileage would double as a result."],["annual mileage","noun phrase /ˈæn.ju.əl ˈmaɪ.lɪdʒ/","số dặm/km đi được mỗi năm","Modelling work by the University of Michigan Transportation Research Institute suggests automated vehicles might reduce vehicle ownership by 43 percent, but that vehicles' average annual mileage would double as a result."],["intensively","adverb /ɪnˈten.sɪv.li/","với cường độ cao","As a consequence, each vehicle would be used more intensively, and might need replacing sooner."],["turnover","noun /ˈtɜːnˌəʊ.vər/","sự luân chuyển/thay thế","This faster rate of turnover may mean that vehicle production will not necessarily decrease."],["mobility provider","noun phrase /məʊˈbɪl.ə.ti prəˌvaɪ.dər/","nhà cung cấp dịch vụ di chuyển","If we move to a model where consumers are tending not to own a single vehicle but to purchase access to a range of vehicles through a mobility provider, drivers will have the freedom to select one that best suits their needs for a particular journey, rather than making a compromise across all their requirements."],["make a compromise","verb phrase /meɪk ə ˈkɒm.prə.maɪz/","thỏa hiệp, chấp nhận sự đánh đổi","If we move to a model where consumers are tending not to own a single vehicle but to purchase access to a range of vehicles through a mobility provider, drivers will have the freedom to select one that best suits their needs for a particular journey, rather than making a compromise across all their requirements."],["unoccupied","adjective /ʌnˈɒk.jə.paɪd/","không có người sử dụng","Since, for most of the time, most of the seats in most cars are unoccupied, this may boost production of a smaller, more efficient range of vehicles that suit the needs of individuals."],["specialised vehicles","noun phrase /ˈspeʃ.əl.aɪzd ˈvɪə.kəlz/","phương tiện chuyên dụng","Specialised vehicles may then be available for exceptional journeys, such as going on a family camping trip or helping a son or daughter move to university."],["exceptional journeys","noun phrase /ɪkˈsep.ʃən.əl ˈdʒɜː.niz/","những chuyến đi đặc biệt/không thường xuyên","Specialised vehicles may then be available for exceptional journeys, such as going on a family camping trip or helping a son or daughter move to university."],["hurdle","noun /ˈhɜː.dəl/","trở ngại, rào cản","There are a number of hurdles to overcome in delivering automated vehicles to our roads."],["regulatory","adjective /ˈreɡ.jə.lə.tər.i/","thuộc về quy định/pháp lý","These include the technical difficulties in ensuring that the vehicle works reliably in the infinite range of traffic, weather and road situations it might encounter; the regulatory challenges in understanding how liability and enforcement might change when drivers are no longer essential for vehicle operation; and the societal changes that may be required for communities to trust and accept automated vehicles as being a valuable part of the mobility landscape."],["liability","noun /ˌlaɪ.əˈbɪl.ə.ti/","trách nhiệm pháp lý","The implementation of robotic car manufacture from the 1970s onwards led to significant cost savings and improvements in the reliability and flexibility of vehicle mass production."],["enforcement","noun /ɪnˈfɔːs.mənt/","việc thực thi (luật/quy định)","These include the technical difficulties in ensuring that the vehicle works reliably in the infinite range of traffic, weather and road situations it might encounter; the regulatory challenges in understanding how liability and enforcement might change when drivers are no longer essential for vehicle operation; and the societal changes that may be required for communities to trust and accept automated vehicles as being a valuable part of the mobility landscape."],["robust research","noun phrase /rəʊˌbʌst rɪˈsɜːtʃ/","nghiên cứu vững chắc/chặt chẽ","Research projects on vehicle automation are not new."],["targeted research","noun phrase /ˌtɑː.ɡɪ.tɪd rɪˈsɜːtʃ/","nghiên cứu có mục tiêu","It's clear that there are many challenges that need to be addressed but, through robust and targeted research, these can most probably be conquered within the next 10 years."],["concrete predictions","noun phrase /ˈkɒŋ.kriːt prɪˈdɪk.ʃənz/","những dự đoán cụ thể, chắc chắn","Mobility will change in such potentially significant ways and in association with so many other technological developments, such as telepresence and virtual reality, that it is hard to make concrete predictions about the future."],["telepresence","noun /ˌtel.iˈprez.əns/","công nghệ hiện diện từ xa","Mobility will change in such potentially significant ways and in association with so many other technological developments, such as telepresence and virtual reality, that it is hard to make concrete predictions about the future."],["virtual reality","noun phrase /ˌvɜː.tʃu.əl riˈæl.ə.ti/","thực tế ảo","Mobility will change in such potentially significant ways and in association with so many other technological developments, such as telepresence and virtual reality, that it is hard to make concrete predictions about the future."]]};
+const KEY={"1":"B","2":"B","3":"C","4":"A","5":"C","6":"D","7":"D","8":"B","9":"E","10":"F","11":"collisions","12":"driving","13":"annual mileage","14":"needs","15":"societal","16":"2010","17":"disabled travellers","18":"telepresence and virtual reality","19":"flexibility"};
+const ALT={};
+const EXP={};
+const TR={"P2":[["But since Google announced in 2010 that it had been trialling self-driving cars on the streets of California, progress in this field has quickly **gathered pace**.","tăng tốc, phát triển nhanh"],["research at the UK's Transport Research Laboratory has demonstrated that more than 90 percent of road collisions involve human error as a **contributory factor**","yếu tố góp phần"],["those who are challenged by existing mobility models – such as older or disabled travellers – may be able to enjoy significantly greater **travel autonomy**","quyền tự chủ trong việc đi lại"],["Automation means that initiatives for car-sharing become much more **viable**, particularly in urban areas with significant travel demand.","khả thi"],["As a consequence, each vehicle would be used more **intensively**, and might need replacing sooner.","với cường độ cao"],["Modelling work by the University of Michigan Transportation Research Institute suggests automated vehicles might reduce **vehicle ownership** by 43 percent.","việc sở hữu phương tiện"],["consumers are tending not to own a single vehicle but to purchase access to a range of vehicles through a **mobility provider**","nhà cung cấp dịch vụ di chuyển"],["the regulatory challenges in understanding how **liability** and enforcement might change when drivers are no longer essential for vehicle operation","trách nhiệm pháp lý"]]};
+$$('.vgrid').forEach(g=>{g.innerHTML=(VOC[g.dataset.deck]||[]).map(([w,p,vi,ex])=>`<div class="vcard"><div class="top"><span class="w">${esc(w)} <span class="pos">(${esc(p)})</span></span><button class="say" data-w="${esc(w)}">▶ nghe</button></div><div class="vi">${esc(vi)}</div><div class="ex">“${esc(ex)}”</div></div>`).join('')});
+let voice=null;function pickVoice(){try{const vs=speechSynthesis.getVoices();voice=vs.find(v=>v.lang==='en-GB')||vs.find(v=>v.lang&&v.lang.startsWith('en'))||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function speak(w){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.lang='en-GB';if(voice)u.voice=voice;u.rate=.85;speechSynthesis.speak(u);return true}catch(e){return false}}
+document.addEventListener('click',e=>{const b=e.target.closest('.say');if(!b)return;e.stopPropagation();if(!speak(b.dataset.w))b.textContent='không hỗ trợ'});
+
+/* ================= FLASHCARDS ================= */
+$$('[data-fc]').forEach(box=>{
+  const P=box.dataset.fc,deck=VOC[P]||[];let known=new Set();try{known=new Set(JSON.parse(store.get('known-'+P)||'[]'))}catch(e){}
+  let order=deck.map((_,i)=>i),idx=0,dir='en',onlyNew=false,flipped=false;
+  box.innerHTML=`<div class="fcmeta"><span data-prog></span><span data-kn></span></div>
+  <button class="fc" type="button" aria-label="Lật thẻ"><div class="in"><div class="face front"></div><div class="face back"></div></div></button>
+  <div class="bar" style="justify-content:center"><button class="btn" data-a="prev">‹ Trước</button><button class="btn" data-a="flip">Lật thẻ</button><button class="btn" data-a="next">Sau ›</button></div>
+  <div class="bar" style="justify-content:center"><button class="btn" data-a="know" style="border-color:var(--ok);color:var(--ok)">✓ Đã thuộc</button><button class="btn red" data-a="again">↺ Chưa thuộc</button></div>
+  <div class="bar" style="justify-content:center"><button class="btn" data-a="dir">Đổi chiều: Anh → Việt</button><button class="btn" data-a="shuf">Xáo thẻ</button><button class="btn" data-a="only">Chỉ ôn thẻ chưa thuộc</button><button class="btn" data-a="clear">Đặt lại tiến độ</button></div>`;
+  const fc=$('.fc',box),fr=$('.front',box),bk=$('.back',box);
+  const list=()=>onlyNew?order.filter(i=>!known.has(i)):order;
+  function render(){const L=list();if(!L.length){fr.innerHTML='<div class="big">🎉</div><div>Bạn đã thuộc hết thẻ.</div>';bk.innerHTML='';$('[data-prog]',box).textContent='0 thẻ';$('[data-kn]',box).textContent=`Đã thuộc ${known.size}/${deck.length}`;fc.classList.remove('flip');return}
+    if(idx>=L.length)idx=0;if(idx<0)idx=L.length-1;const i=L[idx],[w,p,vi,ex]=deck[i];const k=known.has(i)?'<span class="known">✓ Đã thuộc</span>':'';
+    const en=`${k}<div class="big">${esc(w)}</div><div class="hint">(${esc(p)})</div><button class="say" data-w="${esc(w)}">▶ nghe</button><span class="tap">Bấm để lật</span>`;
+    const vn=`${k}<div class="vi">${esc(vi)}</div><div class="ex">“${esc(ex)}”</div><span class="tap">Bấm để lật</span>`;
+    const vn2=`${k}<div class="vi">${esc(vi)}</div><span class="tap">Bấm để lật</span>`;
+    const en2=`${k}<div class="big">${esc(w)}</div><div class="hint">(${esc(p)})</div><div class="ex">“${esc(ex)}”</div><button class="say" data-w="${esc(w)}">▶ nghe</button>`;
+    if(dir==='en'){fr.innerHTML=en;bk.innerHTML=vn}else{fr.innerHTML=vn2;bk.innerHTML=en2}
+    fc.classList.toggle('flip',flipped);$('[data-prog]',box).textContent=`Thẻ ${idx+1}/${L.length}`;$('[data-kn]',box).textContent=`Đã thuộc ${known.size}/${deck.length}`}
+  const saveK=()=>store.set('known-'+P,JSON.stringify([...known]));
+  fc.addEventListener('click',e=>{if(e.target.closest('.say'))return;flipped=!flipped;fc.classList.toggle('flip',flipped)});
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,L=list();
+    if(a==='flip'){flipped=!flipped;fc.classList.toggle('flip',flipped);return}
+    if(a==='prev'){idx--;flipped=false}
+    if(a==='next'){idx++;flipped=false}
+    if(a==='know'&&L.length){known.add(L[idx]);saveK();flipped=false;if(!onlyNew)idx++}
+    if(a==='again'&&L.length){known.delete(L[idx]);saveK();flipped=false;idx++}
+    if(a==='dir'){dir=dir==='en'?'vi':'en';b.textContent=dir==='en'?'Đổi chiều: Anh → Việt':'Đổi chiều: Việt → Anh';flipped=false}
+    if(a==='shuf'){for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}idx=0;flipped=false}
+    if(a==='only'){onlyNew=!onlyNew;b.classList.toggle('on',onlyNew);idx=0;flipped=false}
+    if(a==='clear'){known.clear();saveK();idx=0;flipped=false}
+    render()});
+  box.addEventListener('keydown',e=>{if(e.target===fc&&(e.key===' '||e.key==='Enter')){e.preventDefault();fc.click()}if(e.key==='ArrowRight'){idx++;flipped=false;render()}if(e.key==='ArrowLeft'){idx--;flipped=false;render()}});
+  render()});
+
+/* ================= NAVIGATION ================= */
+let curPart=store.get('part')||'P1';if(!document.getElementById(curPart)){const ft=document.querySelector('.ptab');if(ft)curPart=ft.dataset.part}const subOf={};try{Object.assign(subOf,JSON.parse(store.get('subs')||'{}'))}catch(e){}
+function show(part,sub){curPart=part;subOf[part]=sub||subOf[part]||'v';
+  $$('.ptab').forEach(t=>t.setAttribute('aria-selected',t.dataset.part===part));$$('.part').forEach(p=>p.hidden=p.id!==part);
+  $$('.pill').forEach(p=>p.setAttribute('aria-selected',p.dataset.sub===subOf[part]));$$(`#${part} > .sub`).forEach(s=>s.hidden=s.dataset.sub!==subOf[part]);
+  store.set('part',part);store.set('subs',JSON.stringify(subOf));hideTb();hidePop()}
+$$('.ptab').forEach(t=>t.onclick=()=>{show(t.dataset.part);window.scrollTo({top:0})});
+$$('.pill').forEach(p=>p.onclick=()=>{show(curPart,p.dataset.sub);window.scrollTo({top:0})});
+
+// build TFNG options + explanation shells
+$$('.qitem[data-t="tf"]').forEach(it=>{const q=it.dataset.q;const TFOPTS=it.dataset.opts==='yn'?['YES','NO','NOT GIVEN']:['TRUE','FALSE','NOT GIVEN'];it.insertAdjacentHTML('beforeend',`<div class="opts">${TFOPTS.map(o=>`<label><input type="radio" name="q${q}" value="${o}">${o}</label>`).join('')}<button type="button" class="clr">✕ Bỏ chọn</button></div>`)});
+$$('.qitem[data-t="multi"],.qitem[data-t="mcq"]').forEach(it=>it.insertAdjacentHTML('beforeend','<button type="button" class="clr">✕ Bỏ chọn</button>'));
+$$('.qitem[data-q]').forEach(it=>it.insertAdjacentHTML('beforeend','<span class="dyn" hidden></span><div class="exp" hidden></div>'));
+// matching bank (reusable letters)
+$$('[data-mbank]').forEach(b=>b.innerHTML=b.dataset.mbank.split(',').map(l=>`<span class="chip" tabindex="0" draggable="true" data-v="${l}">${l}</span>`).join(''));
+let selChip=null;
+function setSlot(slot,v){slot.innerHTML=v?`<span class="chip" data-v="${v}">${v}</span>`:'';slot.dataset.v=v||'';saveAns(slot.closest('form'))}
+document.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('.bank .chip');if(c){selChip=c;e.dataTransfer.setData('text/plain',c.dataset.v)}});
+$$('.slot').forEach(s=>{s.tabIndex=0;s.addEventListener('dragover',e=>{e.preventDefault();s.classList.add('over')});s.addEventListener('dragleave',()=>s.classList.remove('over'));
+  s.addEventListener('drop',e=>{e.preventDefault();s.classList.remove('over');const v=e.dataTransfer.getData('text/plain')||(selChip&&selChip.dataset.v);if(v)setSlot(s,v);if(selChip)selChip.classList.remove('sel');selChip=null});
+  s.addEventListener('click',()=>{if(s.closest('form').classList.contains('done'))return;if(selChip){setSlot(s,selChip.dataset.v);selChip.classList.remove('sel');selChip=null}else if(s.dataset.v)setSlot(s,'')});
+  s.addEventListener('keydown',e=>{if(e.key==='Enter')s.click();if(e.key==='Backspace'||e.key==='Delete')setSlot(s,'')})});
+$$('.bank .chip').forEach(c=>{c.addEventListener('click',()=>{if(selChip)selChip.classList.remove('sel');selChip=selChip===c?null:c;if(selChip)c.classList.add('sel')});c.addEventListener('keydown',e=>{if(e.key==='Enter')c.click()})});
+// deselect: button, or click the chosen radio again
+document.addEventListener('click',e=>{const b=e.target.closest('.clr');if(!b)return;const f=b.closest('form');if(f.classList.contains('done'))return;$$('input',b.closest('.qitem')).forEach(x=>x.checked=false);saveAns(f)});
+document.addEventListener('pointerdown',e=>{const l=e.target.closest('.opts label');if(l){const r=l.querySelector('input');r.dataset.was=r.checked?'1':''}},true);
+document.addEventListener('click',e=>{const r=e.target.closest('.opts input[type=radio]');if(r&&r.dataset.was==='1'&&!r.disabled){r.checked=false;r.dataset.was='';saveAns(r.closest('form'))}});
+// choose-two limit
+$$('.multi').forEach(m=>m.addEventListener('change',e=>{const lim=parseInt((m.closest('.qitem')||{}).dataset?.choose||'2',10);const ch=$$('input:checked',m);if(ch.length>lim)e.target.checked=false;saveAns(m.closest('form'))}));
+// persist answers
+function collect(form){const o={};$$('.qitem[data-q]',form).forEach(it=>{const q=it.dataset.q,t=it.dataset.t;
+  if(t==='tf'||t==='mcq'){const r=$('input:checked',it);o[q]=r?r.value:''}else if(t==='gap')o[q]=$('input',it).value;else if(t==='match')o[q]=$('.slot',it).dataset.v||'';else o[q]=$$('input:checked',it).map(x=>x.value)});return o}
+function saveAns(form){store.set('ans-'+form.dataset.form,JSON.stringify(collect(form)))}
+function loadAns(form){let o={};try{o=JSON.parse(store.get('ans-'+form.dataset.form)||'{}')}catch(e){}
+  $$('.qitem[data-q]',form).forEach(it=>{const q=it.dataset.q,t=it.dataset.t,v=o[q];if(v==null)return;
+    if(t==='tf'||t==='mcq'){const r=$(`input[value="${v}"]`,it);if(r)r.checked=true}else if(t==='gap')$('input',it).value=v;else if(t==='match'){const s=$('.slot',it);s.innerHTML=v?`<span class="chip" data-v="${v}">${v}</span>`:'';s.dataset.v=v}else $$('input',it).forEach(x=>x.checked=v.includes(x.value))})}
+$$('form.qs').forEach(f=>{loadAns(f);f.addEventListener('input',()=>saveAns(f));f.addEventListener('change',()=>saveAns(f))});
+const norm=s=>(s||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+function expHTML(q){const d=EXP[q];if(!d)return'';const k=KEY[q];const ks=Array.isArray(k)?k.join(', '):k;
+  let h=`<div><span class="lbl">Câu hỏi:</span> <span class="ql">${d[0]}</span></div>`;
+  if(d[1].length){h+=`<div class="lbl">Đoạn chứa đáp án:</div>`+d[1].map(([en,vi])=>`<div class="en">${en}</div><div class="vi">${vi}</div>`).join('')}
+  if(d[2])h+=`<div>${d[2]}</div>`;
+  if(d[3]&&d[3].length)h+='<div class="lbl">Các cụm paraphrase:</div><table class="pp"><tr><th>Trong câu hỏi</th><th>Trong bài đọc</th></tr>'+d[3].map(([x,y])=>`<tr><td>${x}</td><td>${y}</td></tr>`).join('')+'</table>';
+  h+=`<div class="ans">→ Đáp án: ${ks}</div>`;
+  const locq=String(q).split('-')[0];if(document.querySelector(`[data-loc~="${locq}"]`))h+=`<button type="button" class="loc-btn" data-loc-q="${locq}">Xem vị trí trong bài</button>`;return h}
+function grade(form,silent){form.classList.add('done');let sc=0,tot=0;
+  $$('.qitem[data-q]',form).forEach(it=>{const q=it.dataset.q,t=it.dataset.t,k=KEY[q],dyn=$('.dyn',it),ex=$('.exp',it);let ok,mine;
+    if(t==='multi'){mine=$$('input:checked',it).map(x=>x.value);const hit=mine.filter(v=>k.includes(v)).length;sc+=hit;tot+=k.length;ok=hit===k.length;dyn.textContent=`${hit}/${k.length} đúng · Bạn chọn: ${mine.join(', ')||'—'} · Đáp án: ${k.join(', ')}`}
+    else{tot++;if(t==='tf'||t==='mcq'){const r=$('input:checked',it);mine=r?r.value:''}else if(t==='gap')mine=$('input',it).value.trim();else mine=$('.slot',it).dataset.v||'';
+      ok=t==='gap'?[k,...(ALT[q]||[])].some(a=>norm(a)===norm(mine)):mine===k;if(ok)sc++;dyn.textContent=ok?`✓ Đúng: ${k}`:`✗ Bạn chọn: ${mine||'(bỏ trống)'} · Đáp án: ${k}`}
+    it.classList.remove('right','wrong');it.classList.add(ok?'right':'wrong');dyn.hidden=false;ex.innerHTML=expHTML(q);ex.hidden=false;
+    $$('input',it).forEach(x=>x.disabled=true)});
+  const sb=$('[data-score]',form);sb.innerHTML=`<span class="big">${sc}/${tot}</span><span>câu đúng</span>`;sb.hidden=false;if(!silent)sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  store.set('done-'+form.dataset.form,'1');reapplyIn(form)}
+function resetForm(form){form.classList.remove('done');$$('.qitem[data-q]',form).forEach(it=>{it.classList.remove('right','wrong');$('.dyn',it).hidden=true;const ex=$('.exp',it);ex.hidden=true;ex.innerHTML='';
+  $$('input',it).forEach(x=>{x.disabled=false;if(x.type==='text'||!x.type||x.classList.contains('gin'))x.value='';else x.checked=false});const s=$('.slot',it);if(s){s.innerHTML='';s.dataset.v=''}});
+  $('[data-score]',form).hidden=true;store.del('done-'+form.dataset.form);saveAns(form);$$('.loc-on').forEach(x=>x.classList.remove('loc-on'))}
+$$('form.qs').forEach(f=>{$('[data-act=submit]',f).onclick=()=>grade(f);$('[data-act=reset]',f).onclick=()=>{
+  const b=$('[data-act=reset]',f);if(!b.dataset.arm){b.dataset.arm='1';b.textContent='Bấm lần nữa để xoá bài làm';setTimeout(()=>{delete b.dataset.arm;b.textContent='Làm lại'},3000);return}delete b.dataset.arm;b.textContent='Làm lại';resetForm(f)}});
+document.addEventListener('click',e=>{const b=e.target.closest('.loc-btn');if(!b)return;const part=b.closest('.part');$$('.loc-on',part).forEach(x=>x.classList.remove('loc-on'));
+  const spans=$$(`[data-loc~="${b.dataset.locQ}"]`,part);spans.forEach(s=>s.classList.add('loc-on'));if(spans[0])spans[0].scrollIntoView({behavior:'smooth',block:'center'})});
+
+
+/* ================= TRANSLATION ================= */
+const bold=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+$$('form.tr').forEach(f=>{const P=f.dataset.tr,items=TR[P]||[];
+  f.innerHTML=items.map(([s,a],i)=>`<div class="titem"><p><span class="qnum">${i+1}</span>${bold(s)}</p><input class="tin" id="tr-${P}-${i}" autocomplete="off" placeholder="Nghĩa tiếng Việt…"><p class="tans" hidden>Gợi ý: <b>${esc(a)}</b></p></div>`).join('')+
+  '<div class="bar"><button class="btn primary" type="button" data-tact="show">Nộp & xem đáp án</button><button class="btn" type="button" data-tact="reset">Làm lại</button></div>';
+  const ins=$$('.tin',f);ins.forEach(i=>{const v=store.get(i.id);if(v)i.value=v;i.addEventListener('input',()=>store.set(i.id,i.value))});
+  const showA=()=>{$$('.tans',f).forEach(x=>x.hidden=false);f.classList.add('done');store.set('trdone-'+P,'1')};
+  $('[data-tact=show]',f).onclick=showA;
+  $('[data-tact=reset]',f).onclick=()=>{ins.forEach(i=>{i.value='';store.del(i.id)});$$('.tans',f).forEach(x=>x.hidden=true);f.classList.remove('done');store.del('trdone-'+P)};
+  if(store.get('trdone-'+P))showA()});
+/* ================= HIGHLIGHT & INLINE NOTES ================= */
+const EXCL='.chip,.slot,.dyn,.exp,.scorebox,button,select,input,textarea,.ntag,.say';
+const zoneOf=n=>{const el=n&&(n.nodeType===1?n:n.parentElement);return el?el.closest('.hl-zone'):null};
+function texts(z){const out=[];const w=document.createTreeWalker(z,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest(EXCL)?3:1});let n;while(n=w.nextNode())out.push(n);return out}
+// explanation text is generated after submit → give it its own sub-zones so offsets of the question text stay stable
+let HL=[];try{HL=JSON.parse(store.get('hls')||'[]')||[]}catch(e){HL=[]}
+const saveHL=()=>store.set('hls',JSON.stringify(HL));
+const findH=id=>HL.find(h=>h.id===id);
+const group=id=>$$(`mark.hl[data-id="${id}"]`);
+const gtext=id=>group(id).map(m=>m.textContent).join(' ').replace(/\s+/g,' ').trim();
+function zoneEl(h){return h.x?document.querySelector(`.qitem[data-q="${h.x}"] .exp`):document.getElementById(h.z)}
+function textsFor(h,z){return h.x?textsAll(z):texts(z)}
+function textsAll(z){const out=[];const w=document.createTreeWalker(z,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest('button,.ntag')?3:1});let n;while(n=w.nextNode())out.push(n);return out}
+function tag(h){$$(`.ntag[data-for="${h.id}"]`).forEach(t=>t.remove());if(!h.note)return;const ms=group(h.id);if(!ms.length)return;const t=document.createElement('span');t.className='ntag';t.dataset.for=h.id;t.textContent=h.note;ms[ms.length-1].after(t)}
+function applyH(h){const z=zoneEl(h);if(!z||z.hidden&&h.x)return;if(group(h.id).length)return;let pos=0;const parts=[];
+  textsFor(h,z).forEach(n=>{const L=n.length,a=pos;pos+=L;if(a+L<=h.s||a>=h.e)return;parts.push([n,Math.max(0,h.s-a),Math.min(L,h.e-a)])});
+  parts.forEach(([n,s,e])=>{if(s>=e)return;let t=n;if(e<t.length)t.splitText(e);if(s>0)t=t.splitText(s);if(!t.nodeValue.trim())return;
+    const m=document.createElement('mark');m.className='hl hl-'+h.c;m.dataset.id=h.id;t.parentNode.insertBefore(m,t);m.appendChild(t)});tag(h)}
+function reapplyIn(form){HL.filter(h=>h.x&&form.querySelector(`.qitem[data-q="${h.x}"]`)).forEach(applyH)}
+function offsets(r,z,all){let pos=0,s=null,e=null;(all?textsAll(z):texts(z)).forEach(n=>{const L=n.length;if(r.intersectsNode(n)){const ls=n===r.startContainer?r.startOffset:0,le=n===r.endContainer?r.endOffset:L;if(le>ls){if(s===null)s=pos+ls;e=pos+le}}pos+=L});return s===null?null:[s,e]}
+function addH(r,c,note){const z=zoneOf(r.commonAncestorContainer);if(!z)return;
+  const exEl=(r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentElement).closest('.exp');
+  let h={id:'h'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),z:z.id,c,note:note||''};let o;
+  if(exEl){h.x=exEl.closest('.qitem').dataset.q;o=offsets(r,exEl,true)}else o=offsets(r,z,false);
+  getSelection().removeAllRanges();if(!o)return;h.s=o[0];h.e=o[1];HL.push(h);applyH(h);saveHL();refresh()}
+function unwrap(id){$$(`.ntag[data-for="${id}"]`).forEach(t=>t.remove());group(id).forEach(m=>{const p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()})}
+function delH(id){unwrap(id);HL=HL.filter(h=>h.id!==id);saveHL();refresh()}
+const tb=$('#tb'),pop=$('#pop');let cur=null,popId=null,editId=null,pendRange=null;
+function hideTb(){tb.hidden=true}function hidePop(){pop.hidden=true;popId=null}
+function placeAt(el,rect,below){el.hidden=false;const w=el.offsetWidth,h=el.offsetHeight;let x=rect.left+window.scrollX+rect.width/2-w/2;x=Math.max(window.scrollX+8,Math.min(x,window.scrollX+document.documentElement.clientWidth-w-8));let y=below?rect.bottom+window.scrollY+8:rect.top+window.scrollY-h-8;if(!below&&rect.top<h+200)y=rect.bottom+window.scrollY+8;el.style.left=x+'px';el.style.top=y+'px'}
+let selT;document.addEventListener('selectionchange',()=>{clearTimeout(selT);selT=setTimeout(onSel,180)});
+function onSel(){const s=getSelection();if(!s.rangeCount||s.isCollapsed){hideTb();return}const r=s.getRangeAt(0);const z=zoneOf(r.commonAncestorContainer);if(!z||!s.toString().trim()){hideTb();return}cur=r.cloneRange();hidePop();placeAt(tb,r.getBoundingClientRect(),false)}
+$$('.col').forEach(c=>c.addEventListener('scroll',()=>{hideTb();hidePop()},{passive:true}));
+tb.addEventListener('mousedown',e=>e.preventDefault());
+tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!cur)return;const c=b.dataset.c;hideTb();if(c==='note'){pendRange=cur;editId=null;openModal(cur.toString(),'')}else addH(cur,c)});
+function openModal(q,t){q=q.replace(/\s+/g,' ').trim();$('#mQuote').textContent=q.length>160?q.slice(0,160)+'…':q;$('#mText').value=t;$('#modal').hidden=false;setTimeout(()=>$('#mText').focus(),30)}
+$('#mCancel').onclick=()=>{$('#modal').hidden=true;pendRange=null;editId=null};
+$('#mSave').onclick=()=>{const t=$('#mText').value.trim();$('#modal').hidden=true;
+  if(editId){const h=findH(editId);if(h){h.note=t;tag(h);saveHL();refresh()}editId=null}else if(pendRange){addH(pendRange,'n',t);pendRange=null}};
+document.addEventListener('click',e=>{const m=e.target.closest('mark.hl,.ntag');if(m&&getSelection().isCollapsed){popId=m.dataset.id||m.dataset.for;const h=findH(popId);const n=h&&h.note;$('#popText').textContent=n||'(Chưa có ghi chú)';$('#popEdit').textContent=n?'✎ Sửa ghi chú':'✎ Thêm ghi chú';placeAt(pop,m.getBoundingClientRect(),true);return}if(!e.target.closest('#pop'))hidePop()});
+$('#popEdit').onclick=()=>{const id=popId;hidePop();editId=id;openModal(gtext(id),findH(id)?.note||'')};
+$('#popDel').onclick=()=>{const id=popId;hidePop();delH(id)};
+function refresh(){const list=HL.filter(h=>h.note);$('#fab').textContent=`Ghi chú (${list.length})`;
+  $('#nlist').innerHTML=list.length?'':'<p class="hint">Chưa có ghi chú. Bôi đen một đoạn chữ và chọn “✎ Ghi chú”.</p>';
+  list.forEach(h=>{const z=document.getElementById(h.z);const d=document.createElement('div');d.className='nitem';d.innerHTML='<span class="where"></span><span class="q"></span><span></span>';
+    d.children[0].textContent=(z?z.dataset.label:'')+(h.x?' · Giải thích câu '+h.x:'');d.children[1].textContent='“'+(gtext(h.id)||'…')+'”';d.children[2].textContent=h.note;
+    d.onclick=()=>{const part=z.closest('.part').id;const sub=z.closest('.sub').dataset.sub;show(part,sub);$('#drawer').hidden=true;const ms=group(h.id);if(!ms.length)return;
+      setTimeout(()=>{ms[0].scrollIntoView({behavior:'smooth',block:'center'});ms.forEach(x=>x.classList.add('flash'));setTimeout(()=>ms.forEach(x=>x.classList.remove('flash')),1600)},60)};
+    $('#nlist').appendChild(d)})}
+$('#fab').onclick=()=>{$('#drawer').hidden=!$('#drawer').hidden};$('#dclose').onclick=()=>$('#drawer').hidden=true;
+const fn=$('#freeNote');fn.value=store.get('free')||'';fn.addEventListener('input',()=>store.set('free',fn.value));
+let armed=false;$('#clearAll').onclick=()=>{if(!armed){armed=true;$('#clearAll').textContent='Bấm lần nữa để xác nhận xoá';setTimeout(()=>{armed=false;$('#clearAll').textContent='Xoá tất cả highlight & ghi chú'},3000);return}
+  HL.forEach(h=>unwrap(h.id));HL=[];saveHL();refresh();armed=false;$('#clearAll').textContent='Xoá tất cả highlight & ghi chú'};
+window.addEventListener('resize',()=>{hideTb();hidePop()});
+
+/* ================= INIT ================= */
+HL.filter(h=>!h.x).forEach(applyH);
+$$('form.qs').forEach(f=>{if(store.get('done-'+f.dataset.form))grade(f,true)});
+refresh();
+show(curPart,subOf[curPart]);
+})();
+
+
+</script>
+</body></html>

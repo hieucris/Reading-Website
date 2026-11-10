@@ -214,9 +214,29 @@ table.pp th{background:var(--soft);font-weight:700}
 @media (max-width:920px){.split{grid-template-columns:1fr}.col{max-height:none;position:static}}
 
 
+/* summary / table / flow-chart completion (GAP kinds) + short answer */
+.sumflow{font-family:var(--f-head);line-height:2.15;background:var(--soft);border-radius:8px;padding:12px 16px}
+.sumflow .qitem{display:inline;padding:2px 3px;border-radius:6px}
+.sumflow .qitem .exp{display:flex;margin:8px 0}
+.sumflow .nt,.ctable .nt,.flow .nt{font-weight:700;text-align:center;font-size:1.08rem;font-family:var(--f-head)}
+.sumflow .ns,.ctable .ns,.flow .ns{font-weight:700;margin-top:6px;font-family:var(--f-head)}
+.ctable{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:var(--f-head)}
+.trow{display:flex;flex-wrap:wrap;border-top:1px solid var(--line)}
+.trow:first-child{border-top:none}
+.trow.ctxrow{background:var(--soft);font-weight:600}
+.tcell{flex:1 1 140px;padding:9px 12px;border-left:1px solid var(--line);min-width:0}
+.tcell:first-child{border-left:none}
+.trow.qitem{padding:0;gap:0;border-left:none;border-right:none;border-bottom:none;border-radius:0}
+.trow.qitem.right{background:var(--ok-soft)}
+.trow.qitem.wrong{background:var(--bad-soft)}
+.trow>.dyn,.trow>.exp{flex:1 1 100%;padding:6px 12px}
+.flow{display:flex;flex-direction:column;gap:4px}
+.flow .farrow{text-align:center;color:var(--muted);font-size:1.15rem;line-height:1.1}
+.flow .qitem,.flow .fstep{background:var(--soft);border-radius:8px}
+
 </style></head><body>
 <div class="wrap">
-<header class="brand"><div class="eyebrow">Ms Yen English · IELTS Reading</div><h1>Reading Practice · Test mẫu — The Story of Tea</h1><div class="sub">The Story of Tea · Questions 1–6</div></header>
+<header class="brand"><div class="eyebrow">Ms Thao English · IELTS Reading</div><h1>Reading Practice · Test mẫu — The Story of Tea</h1><div class="sub">The Story of Tea · Questions 1–6</div></header>
 <nav class="nav"><div class="parts" role="tablist"><button class="ptab" data-part="P1" role="tab">Passage 1 · Tea</button></div><div class="pills" role="tablist"><button class="pill" data-sub="v" role="tab"><span class="n">1</span>Từ vựng</button><button class="pill" data-sub="f" role="tab"><span class="n">2</span>Flashcard</button><button class="pill" data-sub="r" role="tab"><span class="n">3</span>Bài đọc</button><button class="pill" data-sub="t" role="tab"><span class="n">4</span>Dịch Anh → Việt</button></div></nav>
 <section class="part" id="P1" hidden>
 <div class="sub hl-zone" id="P1v" data-sub="v" data-label="P1 · Từ vựng"><div><h2>Từ vựng · The Story of Tea</h2><p class="lead">Từ quan trọng trong bài đọc và câu hỏi. Bấm “▶ nghe” để nghe phát âm.</p></div><div class="vgrid" data-deck="P1"></div></div>
@@ -224,7 +244,7 @@ table.pp th{background:var(--soft);font-weight:700}
 <div class="sub" data-sub="r"><div class="split"><div class="col hl-zone" id="P1p" data-label="P1 · Bài đọc"><div class="passage"><h3>The Story of Tea</h3><p class="subh">How a Chinese legend became the world's favourite drink</p><p><span data-loc="1">Tea is the most popular drink in the world after water.</span> <span data-loc="4">It is made from the leaves of the Camellia sinensis plant</span>, which first grew in the forests of south-west China. According to legend, <span data-loc="2">the Chinese emperor Shen Nong discovered tea in 2737 BC when some leaves fell into his pot of boiling water</span>.</p><p>For centuries, tea was used in China mainly as a medicine. It was not until the Tang dynasty that drinking tea became a social activity enjoyed by ordinary people. Tea houses appeared in towns and cities, and poets wrote about the pleasure of drinking tea with friends.</p><p>Tea reached Europe in the early 17th century, brought by Dutch traders. At first it was so expensive that <span data-loc="5">only the rich could afford it</span>, and it was kept in locked boxes. By the 18th century, however, prices had fallen and tea had become the national drink of Britain.</p><p>Today, more than three million tonnes of tea are produced every year. <span data-loc="6">The largest producers are China and India</span>, but tea is also grown in countries such as Kenya and Sri Lanka. Although coffee has become more popular in some countries, tea remains an important part of daily life for billions of people.</p></div></div><div class="col hl-zone" id="P1q" data-label="P1 · Câu hỏi"><form class="qs" data-form="P1" onsubmit="return false"><div class="qblock"><div class="qhead"><b>Questions 1–3</b><br>Choose TRUE if the statement agrees with the information given in the text, choose FALSE if the statement contradicts the information, or choose NOT GIVEN if there is no information on this.</div><div class="qitem" data-q="1" data-t="tf"><div><span class="qnum">1</span>Tea is more popular than water around the world.</div></div><div class="qitem" data-q="2" data-t="tf"><div><span class="qnum">2</span>Shen Nong discovered tea by accident.</div></div><div class="qitem" data-q="3" data-t="tf"><div><span class="qnum">3</span>Shen Nong preferred tea to all other drinks.</div></div></div><div class="qblock"><div class="qhead"><b>Questions 4–6</b><br>Complete the notes below. Write ONE WORD ONLY from the passage for each answer.</div><div class="notes"><div class="nt">The history of tea</div><div class="ns">China</div><div class="qitem" data-q="4" data-t="gap"><div>The drink is made from the <span class="gbox"><span class="qn">4</span><input class="gin" id="i4" autocomplete="off"></span> of the Camellia sinensis plant.</div></div><div class="ns">Europe</div><div class="qitem"><div>• Tea arrived in Europe in the 17th century, brought by Dutch traders.</div></div><div class="qitem" data-q="5" data-t="gap"><div>At first, only the <span class="gbox"><span class="qn">5</span><input class="gin" id="i5" autocomplete="off"></span> could afford tea because it was very expensive.</div></div><div class="ns">Today</div><div class="qitem" data-q="6" data-t="gap"><div>The two largest tea-producing countries today are China and <span class="gbox"><span class="qn">6</span><input class="gin" id="i6" autocomplete="off"></span> .</div></div></div></div><div class="bar"><button class="btn primary" data-act="submit" type="button">Nộp bài</button><button class="btn" data-act="reset" type="button">Làm lại</button></div><div class="scorebox" data-score hidden></div></form></div></div></div>
 <div class="sub hl-zone" id="P1t" data-sub="t" data-label="P1 · Dịch"><div><h2>Dịch Anh → Việt · Tea</h2><p class="lead">Dịch cụm từ in đậm sang tiếng Việt. Bấm “Xem đáp án” để so sánh.</p></div><div class="card"><form class="tr" data-tr="P1" onsubmit="return false"></form></div></div>
 </section>
-<footer><span>Ms Yen English · Đà Nẵng</span><span>Reading Practice · Test mẫu — The Story of Tea</span></footer></div>
+<footer><span>Ms Thao English · Đà Nẵng</span><span>Reading Practice · Test mẫu — The Story of Tea</span></footer></div>
 <button class="fab" id="fab">Ghi chú (0)</button>
 <aside class="drawer" id="drawer" hidden><div class="bar" style="justify-content:space-between"><h3>Ghi chú của tôi</h3><button class="btn" id="dclose">Đóng</button></div><div class="notepad"><label class="hint" for="freeNote">Ghi chú tự do</label><textarea id="freeNote" placeholder="Viết ghi chú của bạn ở đây…"></textarea></div><h4>Ghi chú gắn với bài</h4><div id="nlist" class="nlist"></div><button class="btn red" id="clearAll">Xoá tất cả highlight &amp; ghi chú</button></aside>
 <div class="tb" id="tb" hidden><button class="sw y" data-c="y" aria-label="Highlight vàng"></button><button class="sw g" data-c="g" aria-label="Highlight xanh"></button><button class="sw p" data-c="p" aria-label="Highlight hồng"></button><button class="txt" data-c="note">✎ Ghi chú</button></div>
@@ -234,7 +254,7 @@ table.pp th{background:var(--soft);font-weight:700}
 
 
 (function(){
-const LS='msyen-reading-practice-test-mau-the-story-of-tea-v1-';
+const LS='msthao-reading-practice-test-mau-the-story-of-tea-v1-';
 const store={get(k){try{return localStorage.getItem(LS+k)}catch(e){return null}},set(k,v){try{localStorage.setItem(LS+k,v)}catch(e){}},del(k){try{localStorage.removeItem(LS+k)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
@@ -286,7 +306,7 @@ $$('[data-fc]').forEach(box=>{
   render()});
 
 /* ================= NAVIGATION ================= */
-let curPart=store.get('part')||'P1';const subOf={};try{Object.assign(subOf,JSON.parse(store.get('subs')||'{}'))}catch(e){}
+let curPart=store.get('part')||'P1';if(!document.getElementById(curPart)){const ft=document.querySelector('.ptab');if(ft)curPart=ft.dataset.part}const subOf={};try{Object.assign(subOf,JSON.parse(store.get('subs')||'{}'))}catch(e){}
 function show(part,sub){curPart=part;subOf[part]=sub||subOf[part]||'v';
   $$('.ptab').forEach(t=>t.setAttribute('aria-selected',t.dataset.part===part));$$('.part').forEach(p=>p.hidden=p.id!==part);
   $$('.pill').forEach(p=>p.setAttribute('aria-selected',p.dataset.sub===subOf[part]));$$(`#${part} > .sub`).forEach(s=>s.hidden=s.dataset.sub!==subOf[part]);
@@ -295,7 +315,7 @@ $$('.ptab').forEach(t=>t.onclick=()=>{show(t.dataset.part);window.scrollTo({top:
 $$('.pill').forEach(p=>p.onclick=()=>{show(curPart,p.dataset.sub);window.scrollTo({top:0})});
 
 // build TFNG options + explanation shells
-$$('.qitem[data-t="tf"]').forEach(it=>{const q=it.dataset.q;it.insertAdjacentHTML('beforeend',`<div class="opts">${['TRUE','FALSE','NOT GIVEN'].map(o=>`<label><input type="radio" name="q${q}" value="${o}">${o}</label>`).join('')}<button type="button" class="clr">✕ Bỏ chọn</button></div>`)});
+$$('.qitem[data-t="tf"]').forEach(it=>{const q=it.dataset.q;const TFOPTS=it.dataset.opts==='yn'?['YES','NO','NOT GIVEN']:['TRUE','FALSE','NOT GIVEN'];it.insertAdjacentHTML('beforeend',`<div class="opts">${TFOPTS.map(o=>`<label><input type="radio" name="q${q}" value="${o}">${o}</label>`).join('')}<button type="button" class="clr">✕ Bỏ chọn</button></div>`)});
 $$('.qitem[data-t="multi"],.qitem[data-t="mcq"]').forEach(it=>it.insertAdjacentHTML('beforeend','<button type="button" class="clr">✕ Bỏ chọn</button>'));
 $$('.qitem[data-q]').forEach(it=>it.insertAdjacentHTML('beforeend','<span class="dyn" hidden></span><div class="exp" hidden></div>'));
 // matching bank (reusable letters)
